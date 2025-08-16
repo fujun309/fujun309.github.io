@@ -1,1 +1,69 @@
 
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>资产烧录授权页V2（dayKey 与 code 无关）</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      body{font-family: Arial, sans-serif;padding:12px;max-width:600px}
+      input[type="text"]{padding:4px}
+      .note{color:#666;font-size:13px;margin-top:8px}
+    </style>
+  </head>
+  <body>
+    <h3>资产烧录授权（离线版）</h3>
+    <p><label>dateKey: <input type="text" id="dayKey" style="width:80px"/></label>
+       <button id="showKey">显示今日 dayKey</button></p >
+    <p><label>code: <input type="text" id="code" style="width:220px" /></label>
+       &nbsp; <input type="submit" id="genToken" value="getToken" /></p >
+    <p><label>token: <input type="text" id="token" style="width:120px" /></label></p >
+    <div class="note">说明：dayKey 基于当天日期（与 code 无关，4 位）。token 为 6 位。</div>
+
+  <script>
+/* 内嵌 CryptoJS 风格实现（保留原始算法） */
+!function(e){var t={};function n(r){if(t[r])return t[r].exports;var i=t[r]={i:r,l:!1,exports:{}};return e[r].call(i.exports,i,i.exports,n),i.l=!0,i.exports}n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)n.d(r,i,function(t){return e[t]}.bind(null,i));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=0)}([function(e,t){var n,r,i,o,s,a=a||function(e,t){var n={},r=n.lib={},i=function(){},o=r.Base={extend:function(e){i.prototype=this;var t=new i;return e&&t.mixIn(e),t.hasOwnProperty("init")||(t.init=function(){t.$super.init.apply(this,arguments)}),t.init.prototype=t,t.$super=this,t},create:function(){var e=this.extend();return e.init.apply(e,arguments),e},init:function(){},mixIn:function(e){for(var t in e)e.hasOwnProperty(t)&&(this[t]=e[t]);e.hasOwnProperty("toString")&&(this.toString=e.toString)},clone:function(){return this.init.prototype.extend(this)}},s=r.WordArray=o.extend({init:function(e,t){e=this.words=e||[],this.sigBytes=null!=t?t:4*e.length},toString:function(e){return(e||u).stringify(this)},concat:function(e){var t=this.words,n=e.words,r=this.sigBytes;if(e=e.sigBytes,this.clamp(),r%4)for(var i=0;i<e;i++)t[r+i>>>2]|=(n[i>>>2]>>>24-i%4*8&255)<<24-(r+i)%4*8;else if(65535<n.length)for(i=0;i<e;i+=4)t[r+i>>>2]=n[i>>>2];else t.push.apply(t,n);return this.sigBytes+=e,this},clamp:function(){var t=this.words,n=this.sigBytes;t[n>>>2]&=4294967295<<32-n%4*8,t.length=e.ceil(n/4)},clone:function(){var e=o.clone.call(this);return e.words=this.words.slice(0),e},random:function(t){for(var n=[],r=0;r<t;r+=4)n.push(4294967296*e.random()|0);return new s.init(n,t)}}),a=n.enc={},u=a.Hex={stringify:function(e){var t=e.words;e=e.sigBytes;for(var n=[],r=0;r<e;r++){var i=t[r>>>2]>>>24-r%4*8&255;n.push((i>>>4).toString(16)),n.push((15&i).toString(16))}return n.join("")},parse:function(e){for(var t=e.length,n=[],r=0;r<t;r+=2)n[r>>>3]|=parseInt(e.substr(r,2),16)<<24-r%8*4;return new s.init(n,t/2)}},c=a.Latin1={stringify:function(e){var t=e.words;e=e.sigBytes;for(var n=[],r=0;r<e;r++)n.push(String.fromCharCode(t[r>>>2]>>>24-r%4*8&255));return n.join("")},parse:function(e){for(var t=e.length,n=[],r=0;r<t;r++)n[r>>>2]|=(255&e.charCodeAt(r))<<24-r%4*8;return new s.init(n,t)}},l=a.Utf8={stringify:function(e){try{return decodeURIComponent(escape(c.stringify(e)))}catch(e){throw Error("Malformed UTF-8 data")}},parse:function(e){return c.parse(unescape(encodeURIComponent(e)))}},f=r.BufferedBlockAlgorithm=o.extend({reset:function(){this._data=new s.init,this._nDataBytes=0},_append:function(e){"string"==typeof e&&(e=l.parse(e)),this._data.concat(e),this._nDataBytes+=e.sigBytes},_process:function(t){var n=this._data,r=n.words,i=n.sigBytes,o=this.blockSize,a=i/(4*o);if(t=(a=t?e.ceil(a):e.max((0|a)-this._minBufferSize,0))*o,i=e.min(4*t,i),t){for(var u=0;u<t;u+=o)this._doProcessBlock(r,u);u=r.splice(0,t),n.sigBytes-=i}return new s.init(u,i)},clone:function(){var e=o.clone.call(this);return e._data=this._data.clone(),e},_minBufferSize:0});r.Hasher=f.extend({cfg:o.extend(),init:function(e){this.cfg=this.cfg.extend(e),this.reset()},reset:function(){f.reset.call(this),this._doReset()},update:function(e){return this._append(e),this._process(),this},finalize:function(e){return e&&this._append(e),this._doFinalize()},blockSize:16,_createHelper:function(e){return function(t,n){return new e.init(n).finalize(t)}},_createHmacHelper:function(e){return function(t,n){return new h.HMAC.init(e,n).finalize(t)}}});var h=n.algo={};return n}(Math);function u(e,t){for(;e.length<t;)e="0"+e;return e}function c(e){var t=e.words,n=(e.sigBytes,t[4]>>>0&15),r=t[n>>>2]>>>24-n%4*8&255,i=t[++n>>>2]>>>24-n%4*8&255,o=t[++n>>>2]>>>24-n%4*8&255,s=t[++n>>>2]>>>24-n%4*8&255,a=((r=(127&r)<<24)|(i=(255&i)<<16)|(o=(255&o)<<8)|(s&=255))%1e6+"";return a=u(a,6)}function l(e){var t=a.enc.Hex.parse(e);return c(a.HmacSHA1(t,"r"+e+"ui")).substr(0,4)}function f(){var e=document.getElementById("dayKey").value;return l(h(new Date,"yyMMdd"))===e}function h(e,t){let n={"M+":e.getMonth()+1,"d+":e.getDate(),"h+":e.getHours(),"m+":e.getMinutes(),"s+":e.getSeconds(),"q+":Math.floor((e.getMonth()+3)/3),S:e.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(e.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in n)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?n[e]:("00"+n[e]).substr((""+n[e]).length)));return t}r=(s=(n=a).lib).WordArray,i=s.Hasher,o=[],s=n.algo.SHA1=i.extend({_doReset:function(){this._hash=new r.init([1732584193,4023233417,2562383102,271733878,3285377520])},_doProcessBlock:function(e,t){for(var n=this._hash.words,r=n[0],i=n[1],s=n[2],a=n[3],u=n[4],c=0;80>c;c++){if(16>c)o[c]=0|e[t+c];else{var l=o[c-3]^o[c-8]^o[c-14]^o[c-16];o[c]=l<<1|l>>>31}l=(r<<5|r>>>27)+u+o[c],l=20>c?l+(1518500249+(i&s|~i&a)):40>c?l+(1859775393+(i^s^a)):60>c?l+((i&s|i&a|s&a)-1894007588):l+((i^s^a)-899497514),u=a,a=s,s=i<<30|i>>>2,i=r,r=l}n[0]=n[0]+r|0,n[1]=n[1]+i|0,n[2]=n[2]+s|0,n[3]=n[3]+a|0,n[4]=n[4]+u|0},_doFinalize:function(){var e=this._data,t=e.words,n=8*this._nDataBytes,r=8*e.sigBytes;return t[r>>>5]|=128<<24-r%32,t[14+(r+64>>>9<<4)]=Math.floor(n/4294967296),t[15+(r+64>>>9<<4)]=n,e.sigBytes=4*t.length,this._process(),this._hash},clone:function(){var e=i.clone.call(this);return e._hash=this._hash.clone(),e}}),n.SHA1=i._createHelper(s),n.HmacSHA1=i._createHmacHelper(s),function(){var e=a,t=e.enc.Utf8;e.algo.HMAC=e.lib.Base.extend({init:function(e,n){e=this._hasher=new e.init,"string"==typeof n&&(n=t.parse(n));var r=e.blockSize,i=4*r;n.sigBytes>i&&(n=e.finalize(n)),n.clamp();for(var o=this._oKey=n.clone(),s=this._iKey=n.clone(),a=o.words,u=s.words,c=0;c<r;c++)a[c]^=1549556828,u[c]^=909522486;o.sigBytes=s.sigBytes=i,this.reset()},reset:function(){var e=this._hasher;e.reset(),e.update(this._iKey)},update:function(e){return this._hasher.update(e),this},finalize:function(e){var t=this._hasher;return e=t.finalize(e),t.reset(),t.finalize(this._oKey.clone().concat(e))}})}();var d=new Date;d.getFullYear(),d.getMonth(),d.getDate();
+
+/* UI 按钮绑定：显示今日 dayKey（仅调试用） */
+document.getElementById("showKey").onclick = function(){
+  var todayHex = h(new Date,"yyMMdd");
+  var expected = l(todayHex);
+  alert("今日 dayKey（4 位）: " + expected);
+};
+
+/* token 生成（保留原始行为） */
+document.getElementById("genToken").onclick = function(){
+  document.getElementById("token").value = "";
+
+  var codeVal = document.getElementById("code").value || "";
+  if (!codeVal) { alert("code is empty"); return; }
+  if (!f()) { alert("key is wrong"); return; }
+
+  // r = "STANDBOX"
+  var rArr = [83,84,65,78,68,66,79,88];
+  var rStr = "";
+  for (var ii=0; ii<rArr.length; ii++) rStr += String.fromCharCode(rArr[ii]);
+
+  // time step key: floor(now/300000).toString(16).toUpperCase() padded to 16 chars
+  var now = (new Date).getTime();
+  var sHex = Math.floor(now/300000).toString(16).toUpperCase();
+  sHex = u(sHex,16);
+  var sKey = a.enc.Hex.parse(sHex);
+
+  // p fixed string
+  var dArr = [116,50,100,48,109,49,106,57,100,48,122,57,114,48,100,53,115,33,98];
+  var pStr = "";
+  for (var j=0;j<dArr.length;j++) pStr += String.fromCharCode(dArr[j]);
+
+  var message = rStr + codeVal + pStr;
+  // 使用与原始实现一致的调用形态：message = sKey (WordArray), key = message string
+  // CryptoJS 的 HmacSHA1 可以接受 WordArray 作为 message，所以这里使用 a.HmacSHA1(sKey, message)
+  var hmac = a.HmacSHA1(sKey, message);
+  var token = c(hmac); // 6-digit
+  document.getElementById("token").value = token;
+};
+
+}]); // end wrapper
+  </script>
+  </body>
+</html>
