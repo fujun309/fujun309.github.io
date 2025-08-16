@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>资产烧录授权页V2（dayKey 与 code 无关）</title>
+    <title>资产烧录授权页</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
       body{font-family: Arial, sans-serif;padding:12px;max-width:600px}
@@ -12,13 +12,13 @@
     </style>
   </head>
   <body>
-    <h3>资产烧录授权（离线版）</h3>
+    <h3>资产烧录授权</h3>
     <p><label>dateKey: <input type="text" id="dayKey" style="width:80px"/></label>
        <button id="showKey">显示今日 dayKey</button></p >
     <p><label>code: <input type="text" id="code" style="width:220px" /></label>
        &nbsp; <input type="submit" id="genToken" value="getToken" /></p >
     <p><label>token: <input type="text" id="token" style="width:120px" /></label></p >
-    <div class="note">说明：dayKey 基于当天日期（与 code 无关，4 位）。token 为 6 位。</div>
+    <div class="note">说明：丰巢科技公司内部使用。</div>
 
   <script>
 /* 内嵌 CryptoJS 风格实现（保留原始算法） */
